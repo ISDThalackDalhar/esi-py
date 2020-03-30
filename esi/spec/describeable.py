@@ -1,6 +1,6 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
-from esi.utils import to_camel_case, cached_property
+from esi.utils import cached_property, to_camel_case
 
 
 class PropDict(dict):
@@ -102,14 +102,10 @@ class Describeable:
 
     @property
     def typing_type_name(self):
-        # noinspection PyUnresolvedReferences
-        from typing import TypingMeta
         tt = self.typing_type
         if tt is None:
             return None
-        if isinstance(tt, TypingMeta):
-            return str(tt)
-        return tt.__name__
+        return getattr(tt, '__name__', str(tt))
 
     def validate(self, value):
         return self.internal_type.validate(self, value)
@@ -231,4 +227,3 @@ class Property(Describeable):
 
 class Item(Describeable):
     pass
-

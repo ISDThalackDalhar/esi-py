@@ -1,15 +1,12 @@
+import base64
 import decimal
-from datetime import datetime, date
-from typing import List, Any, Dict, Tuple
-# noinspection PyUnresolvedReferences
-from typing import TypingMeta
-
-from esi.exceptions import ValidationError
-from esi.spec.describeable import Describeable, Property
+from datetime import date, datetime
+from typing import Any, Dict, List, Tuple
 
 import iso8601
 import rfc3339
-import base64
+from esi.exceptions import ValidationError
+from esi.spec.describeable import Describeable, Property
 
 
 class Type:
