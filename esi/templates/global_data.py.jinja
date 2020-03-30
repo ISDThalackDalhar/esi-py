@@ -1,0 +1,32 @@
+{%- if not included -%}
+import typing
+from esi.spec import *  # noqa
+{% endif %}
+{% block global_params -%}
+#
+# Global parameters
+#
+{%- for name, param in spec.global_parameters.items()|sort %}
+{{ name|to_pascal_case }}Parameter = {{ param|describe }}
+{% endfor %}
+{%- endblock global_params %}
+
+{% block global_defs -%}
+#
+# Global definitions
+#
+{%- for name, schema in spec.global_definitions.items()|sort %}
+{{ schema.title|to_pascal_case }}Definition = {{ schema|describe }}
+{% endfor %}
+{%- endblock global_defs %}
+{%- if not included %}
+
+__all__ = [
+    {%- for name, schema in spec.global_parameters.items()|sort %}
+    '{{ name|to_pascal_case }}Parameter',
+    {%- endfor %}
+    {%- for name, schema in spec.global_definitions.items()|sort %}
+    '{{ name|to_pascal_case }}Definition',
+    {%- endfor %}
+]
+{% endif %}

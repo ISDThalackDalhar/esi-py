@@ -1,0 +1,5 @@
+include MANIFEST.in
+include requirements.txt
+graft esi
+global-exclude __pycache__
+global-exclude *.py[co]

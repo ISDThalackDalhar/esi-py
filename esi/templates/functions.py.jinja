@@ -1,0 +1,53 @@
+{%- if not included -%}
+import typing
+from esi.spec import *  # noqa
+from {{ base_namespace|default('') }}.{{ global_data_module|default('global_data') }} import *  # noqa
+{% endif %}
+#
+# Information regarding all functions
+#
+
+{% for name, path in spec.paths.items()|sort %}
+class {{ path.function_name }}(Function):
+    {% filter indent(4) %}{% include 'includes/class_description.py.jinja' %}{% endfilter %}
+    path = {{ path.url|describe }}
+    name = {{ path.operation_id|describe }}
+    method = {{ path.method|describe }}
+    tags = [{% for tag in path.tags|sort %}{{ tag|describe }}{% endfor %}]
+    scopes = [
+{%- for scope in path.scopes|sort %}
+        {{ scope|describe }}
+{%- endfor %}
+    ]
+    params = [
+{%- for param in path.ordered_parameters %}
+{%- if param.is_global %}
+        {{ param.name|to_pascal_case }}Parameter
+{%- else %}
+        {{ param|describe(8, True) }}
+{%- endif %},
+{%- endfor %}
+    ]
+    responses = {
+{%- for code, resp in path.ordered_responses %}
+        {{ code }}:{{ ' ' }}
+{%- if resp.is_global -%}
+        {{ resp.title|to_pascal_case }}Definition
+{%- else -%}
+        {{ resp|describe(8, True) }}
+{%- endif %},
+{%- endfor %}
+    }
+
+    def __init__({% filter reindent(100, 17) %}{% include 'includes/function_signature.py.jinja' %}{% endfilter %}):
+        {% filter indent(8) %}{% include 'includes/function_description.py.jinja' %}{% endfilter %}
+        super().__init__({% filter indent(25) %}{% include 'includes/calling_parameters.py.jinja' %}{% endfilter %})
+
+{% endfor %}
+{%- if not included %}
+__all__ = [
+{%- for name, path in spec.paths.items()|sort %}
+    '{{ path.function_name }}',
+{%- endfor %}
+]
+{% endif %}

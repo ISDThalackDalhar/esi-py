@@ -1,0 +1,2 @@
+{%- set j=joiner(", ") -%}{%- set maxlen=95 %}
+{%- filter wordwrap_lines(maxlen) %}{% if use_self|default(False) %}{{ j() }}self{% endif %}{%- for param in path.ordered_parameters %}{{ j() }}{{ param.safe_name }}={{ param.safe_name }}{%- endfor %}{% endfilter %}

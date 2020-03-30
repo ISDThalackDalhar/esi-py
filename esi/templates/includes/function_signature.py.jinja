@@ -1,0 +1,5 @@
+{%- set j=joiner(", ") -%}
+{{ j() }}self
+{%- for param in path.ordered_parameters %}{{ j() }}
+{{ param.call_signature }}
+{%- endfor %}

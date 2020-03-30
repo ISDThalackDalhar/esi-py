@@ -1,0 +1,9 @@
+import typing
+from esi.core import ESIBase
+from esi.spec import *
+
+{% with included=True %}
+{%- include 'global_data.py.jinja' %}
+{%- include 'base.py.jinja' %}
+{%- include 'function_list.py.jinja' %}
+{% endwith %}

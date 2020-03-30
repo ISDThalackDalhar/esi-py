@@ -1,0 +1,48 @@
+{%- if not included -%}
+from esi.core import ESIBase
+from {{ base_namespace|default('') }}.{{ global_data_module|default('global_data') }} import *  # noqa
+{%- endif %}
+{%- set klass_name=main_class_name|default("ESI") %}
+
+
+class {{ klass_name }}(ESIBase):
+    """
+    {{ spec.title }}
+
+    {{ spec.description }}
+    """
+    version = '{{ spec.version }}'
+    host = {{ spec.host|describe }}
+    base_path = {{ spec.base_path|describe }}
+    schemes = {{ spec.schemes|describe }}
+
+    global_parameters = {
+{%- for name, param in spec.global_parameters.items()|sort %}
+        "{{ name }}": {{ name|to_pascal_case }}Parameter,
+{%- endfor %}
+    }
+    global_definitions = {
+{%- for name, param in spec.global_definitions.items()|sort %}
+        "{{ name }}": {{ name|to_pascal_case }}Definition,
+{%- endfor %}
+    }
+{%- if spec.sso %}
+
+    class SSO:
+        type = {{ spec.sso.type|describe }}
+        flow = {{ spec.sso.flow|describe }}
+        authorizationUrl = {{ spec.sso.authorizationUrl|describe }}
+        scopes = [
+{%- for scope in spec.sso.scopes.keys()|sort  %}
+            {{ scope|describe }},
+{%- endfor %}
+        ]
+{%- endif %}
+
+{%- if not included %}
+
+
+__all__ = [
+    'ESI',
+]
+{% endif %}

@@ -1,0 +1,7 @@
+typing; python_version < '3.5'
+jsonref>=0.1
+rfc3339
+iso8601
+requests
+Jinja2
+aiohttp

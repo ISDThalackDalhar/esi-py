@@ -1,0 +1,3 @@
+{%- if path.description %}"""
+{% filter wordwrap_lines(100) %}{{ path.description }}{% endfilter %}
+"""{%- endif -%}

@@ -1,0 +1,28 @@
+{%- if not included -%}
+{%- with %}
+{%- set ns = base_namespace|default('') %}
+{%- set global_data = global_data_module|default('global_data') %}
+{%- set base = base_module|default('base') %}
+{%- set functions = functions_module|default('functions') %}
+#
+# Importing from global data
+#
+from {{ ns }}.{{ global_data }} import *  # noqa
+# noinspection PyUnresolvedReferences,PyProtectedMember
+from {{ ns }}.{{ global_data }} import __all__ as global_data_all
+#
+# Importing from base
+#
+from {{ ns }}.{{ base }} import *  # noqa
+# noinspection PyUnresolvedReferences,PyProtectedMember
+from {{ ns }}.{{ base }} import __all__ as base_all
+#
+# Importing from functions list
+#
+from {{ ns }} import {{ functions }}
+
+__all__ = [
+    '{{ functions }}',
+] + global_data_all + base_all
+{% endwith %}
+{%- endif %}
