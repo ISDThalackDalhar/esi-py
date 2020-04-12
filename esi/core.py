@@ -1,7 +1,10 @@
 from typing import List
 
-from esi.sessions import BaseSession, BaseSyncSession, BaseAsyncSession, SyncSession, AsyncSession
+#from esi.sessions import BaseSession, BaseSyncSession, BaseAsyncSession, SyncSession, AsyncSession
+from esi.client import Client, AsyncClient
 from esi.utils import USER_AGENT
+
+from urllib.parse import urlunparse
 
 
 class ESIBaseMetaClass(type):
@@ -23,8 +26,8 @@ class ESIBase(metaclass=ESIBaseMetaClass):
     base_path = None  # type: str
     schemes = ['https']  # type: List[str]
 
-    session_class = SyncSession
-    async_session_class = AsyncSession
+    session_class = Client
+    async_session_class = AsyncClient
 
     user_agent = USER_AGENT
 
@@ -58,18 +61,22 @@ class ESIBase(metaclass=ESIBaseMetaClass):
 
     def get_session_class(self):
         klass = self.session_class
-        if not issubclass(klass, BaseSyncSession):
-            raise TypeError("session_class does not subclass BaseSyncSession")
+        if not issubclass(klass, Client):
+            raise TypeError("session_class does not subclass Client")
         return klass
 
     def get_async_session_class(self):
         klass = self.async_session_class
-        if not issubclass(klass, BaseAsyncSession):
-            raise TypeError("async_session_class does not subclass BaseAsyncSession")
+        if not issubclass(klass, AsyncClient):
+            raise TypeError("async_session_class does not subclass AsyncClient")
         return klass
 
     def get_scheme(self):
         return (self.schemes + ['https'])[0]
+
+    @property
+    def url_root(self):
+        return urlunparse((self.get_scheme(), self.host, self.base_path, '', '', ''))
 
     @classmethod
     def session(cls, *, auth_token, enabled_scopes=None):
@@ -83,18 +90,18 @@ class ESIBase(metaclass=ESIBaseMetaClass):
 
     def __enter__(self):
         self.active_session = self.get_session_class()(esi=self)
-        return self.active_session
+        return self.active_session.__enter__()
 
     def __aenter__(self):
         self.active_session = self.get_async_session_class()(esi=self)
-        return self.active_session
+        return self.active_session.__aenter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.active_session:
-            self.active_session.close()
+            self.active_session.__exit__(exc_type, exc_val, exc_tb)
             self.active_session = None
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.active_session:
-            self.active_session.close()
+            await self.active_session.__aexit__(exc_type, exc_val, exc_tb)
             self.active_session = None

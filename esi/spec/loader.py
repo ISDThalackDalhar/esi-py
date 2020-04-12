@@ -3,7 +3,7 @@ from distutils.version import StrictVersion
 from urllib.parse import urlunparse
 
 import jsonref
-import requests
+import httpx
 
 from esi.exceptions import InvalidSpecError
 from esi.spec.parameter import Parameter
@@ -122,7 +122,7 @@ class ESISpec:
 
     @classmethod
     def from_url(cls, url, params=None):
-        resp = requests.get(url, params=params, headers={
+        resp = httpx.get(url, params=params, headers={
             'User-Agent': USER_AGENT,
         })
         return cls(resp.json())

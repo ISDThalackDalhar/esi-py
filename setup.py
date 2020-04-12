@@ -6,8 +6,8 @@ from setuptools import find_packages, setup
 EXCLUDE_FROM_PACKAGES = ['tests']
 version = __import__('esi.version').__version__
 
-if sys.version_info < (3, 4):
-    sys.exit("Sorry, but we require python >= 3.4 to function")
+if sys.version_info <= (3, 7):
+    sys.exit("Sorry, but we require python >= 3.7 to function")
 
 
 def _parse_requirements(fh, dname):
@@ -72,7 +72,7 @@ setup(
         'esi-py-generate = esi.commands:generate [gen]',
     ]},
     install_requires=required_setup,
-    python_requires='>=3.4',
+    python_requires='>=3.7',
     cmdclass=cmdclass,
     command_options={
         'build_sphinx': {
@@ -94,10 +94,8 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]

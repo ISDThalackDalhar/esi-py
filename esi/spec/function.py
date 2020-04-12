@@ -1,11 +1,15 @@
 from typing import List
 
+from httpx import Request, URL, Headers
+from httpx._content_streams import encode
+from httpx._utils import ElapsedTimer
+
 from esi.exceptions import ValidationError
 from esi.spec.schema import Schema
 from esi.spec.parameter import Parameter
 
 
-class Function:
+class Function(Request):
     path = None  # type: str
     name = None  # type: str
     method = None  # type: str
@@ -15,7 +19,7 @@ class Function:
     responses = {}  # type: Dict[int, Schema]
 
     def __init__(self, **kwargs):
-        self.data = data = {
+        data = {
             'body': {},
             'headers': {},
             'path': {},
@@ -35,6 +39,22 @@ class Function:
             data[param.part][param.name] = value
         if errors and not skip_validation:
             raise ValidationError(errors)
+
+        cls = self.__class__
+        body = None
+        if data['body']:
+            body = list(data['body'].values())[0]
+        
+        self.method = cls.method.upper()
+        self.url = URL(self.path.format(**data['path']), allow_relative=True, params=data['query'])
+        self.headers = Headers(data['header'])
+        self.stream = encode(body, None, None)
+        self.timer = ElapsedTimer()
+        self.prepare()
+        # Clear out headers we don't need (These will be set by the session)
+        for key in ["User-Agent"]:
+            if key in self.headers:
+                del self.headers[key]
 
     @classmethod
     def decorate(cls, func):
